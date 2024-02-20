@@ -8,8 +8,8 @@ from datetime import datetime
 from collections import defaultdict
 from generator import Generator
 from grid import GridMap
-from strategies.midpt import StrategyMidPt
-from strategies.far import StrategyFar
+from strategies.hybrid import StrategyHybrid
+from strategies.avoidant import StrategyAvoidant
 
 
 @unique
@@ -114,7 +114,7 @@ class IIPGenerator(Generator):
             origin=self.agent_pos,
             size=[self.world_size, self.world_size],
             trg_silo=self.targer_pos_index)
-        model = StrategyMidPt(gmap)
+        model = StrategyHybrid(gmap)
 
         regions = model.coloring_saturated()
         misleading_regions = regions[self.other_pos_index + 1]
@@ -223,7 +223,7 @@ class IIPGenerator(Generator):
                                        size=[self.world_size, self.world_size],
                                        trg_silo=self.targer_pos_index)
 
-        model_far = StrategyFar(gmap)
+        model_far = StrategyAvoidant(gmap)
         far_paths = []
         for i in range(model_far.grid_map.silo_num):
             if model_far.grid_map.silos[i+1] != self.target_pos:
@@ -398,7 +398,7 @@ class IIPGenerator(Generator):
                         origin=self.agent_pos,
                         size=[self.world_size, self.world_size],
                         trg_silo=self.targer_pos_index)
-                    model = StrategyMidPt(gmap)
+                    model = StrategyHybrid(gmap)
 
                     regions = model.coloring_saturated()
                     misleading_regions = regions[self.other_pos_index + 1]

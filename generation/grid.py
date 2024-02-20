@@ -237,6 +237,4 @@ def grid_map_dec_constructor():
         GridMap.TILE_DEC[v] = k
 
 
-if __name__ == '__main__':
-
-    grid_map_dec_constructor()
+grid_map_dec_constructor()

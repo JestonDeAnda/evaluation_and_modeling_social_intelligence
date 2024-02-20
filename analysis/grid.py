@@ -26,16 +26,11 @@ class GridMap:
     }
     TILE_DEC = {}
     BLOCK_TILE = 1
-    COLORMAP = {
-        1: np.array([0.5, 0.5, 0.5, 1.]),
-        2: np.array([0., 1., 0., 1.]),
-        -1: np.array([1., 0., 0., 1.]),
-        -2: np.array([0., 0., 1., 1.])
-    }
 
     def __init__(self,
                  xlim: int,
                  ylim: int,
+                 trg_silo: int = None,
                  pattern: np.ndarray = None,
                  silo_num: int = 2,
                  silo_a: List[int] = None,
@@ -47,6 +42,7 @@ class GridMap:
         self.board = np.zeros([xlim, ylim], dtype=np.int8)
         self.silos = {}
         self.origin = None
+        self.trg_silo = trg_silo
         self.dist_action = {
             self.TILE_ENC["block"]: (lambda x: (False, self.INF)),
             "OTHER": lambda x: (True, 1)
@@ -64,6 +60,20 @@ class GridMap:
 
         # RGBA setup of the board.
         self.reset_colorboard()
+
+    @property
+    def COLORMAP(self):
+        colormap = {
+            1: np.array([0.5, 0.5, 0.5, 1.]),
+            2: np.array([0., 1., 0., 1.]),
+            # RED
+            -1: np.array([1., 0., 0., 1.]),
+            # BLUE
+            -2: np.array([0., 0., 1., 1.])
+        }
+        if self.trg_silo == 1:
+            colormap[-1], colormap[-2] = colormap[-2], colormap[-1]
+        return colormap
 
     def reset_colorboard(self):
         self.color_board = np.ones(list(self.board.shape) + [4], dtype=float)
@@ -206,6 +216,17 @@ class GridMap:
         if cached:
             self.dist_bank[region] = dist.copy()
         return dist.copy()
+
+    @staticmethod
+    def construct_board(obstacle, silos, trg_silo, origin, size=None):
+        if size is None:
+            size = [5, 5]
+        gmap = GridMap(*size, trg_silo=trg_silo)
+        for i, s in enumerate(silos):
+            gmap.set_silo(i + 1, s)
+        gmap.set_origin(origin)
+        gmap.set_blocks(obstacle)
+        return gmap
 
 
 def grid_map_dec_constructor():

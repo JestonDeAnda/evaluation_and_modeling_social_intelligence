@@ -1,5 +1,5 @@
 """
-Far Path Generation @ ToM GW
+Avoidant Path Generation @ ToM GW
 
 J. Wang
 """
@@ -10,14 +10,14 @@ from pathfinding.core.grid import Grid
 from pathfinding.finder.bi_a_star import AStarFinder
 from pathfinding.core.diagonal_movement import DiagonalMovement
 
-from generation.strategies.util import GridMap
-from generation.strategies.base import BaseStrategy
-from generation.strategies.midpt import StrategyMidPt
-from generation.grid import GridMap
+
+from .base import BaseStrategy
+from .hybrid import StrategyHybrid
+from grid import GridMap
 
 
-class StrategyFar(StrategyMidPt):
-    """Strategy 3: Far"""
+class StrategyAvoidant(StrategyHybrid):
+    """Strategy 3: Avoidant"""
     path_finder = AStarFinder(diagonal_movement=DiagonalMovement.never)
 
     def __init__(self, grid_map: GridMap, **kwargs):
@@ -37,15 +37,15 @@ class StrategyFar(StrategyMidPt):
         grid = Grid(matrix=board.T)
         start = grid.node(*start)
         end = grid.node(*end)
-        path, _ = StrategyFar.path_finder.find_path(start, end, grid)
+        path, _ = StrategyAvoidant.path_finder.find_path(start, end, grid)
         # print(board.T)
         return path
 
     @staticmethod
     def _is_connected(board: np.ndarray, start: np.ndarray, end: np.ndarray):
-        path = StrategyFar._find_path(board, start, end)
+        path = StrategyAvoidant._find_path(board, start, end)
         return all(x.walkable for x in path) and len(path) > 0
-        # return len(StrategyFar._find_path(board, start, end)) > 0
+        # return len(StrategyAvoidant._find_path(board, start, end)) > 0
 
     def generate_max_block(self,
                            dest_silo: int,
@@ -101,7 +101,7 @@ class StrategyFar(StrategyMidPt):
 
     def path_generation(self, dest_silo: int, **kwargs):
         """
-        Generate the Far path.
+        Generate the Avoidant path.
         """
         if kwargs.get("from_colored", False):
             regions = self.coloring_saturated()
@@ -148,7 +148,7 @@ def main(**kwargs):
         gmap = construct_board(obstacles, objects, agent, size)
 
     # print(gmap.get_origin())
-    model = StrategyFar(gmap)
+    model = StrategyAvoidant(gmap)
     path = model.path_generation(1, from_colored=True)
     print(model.avoidance.T)
     print("Path_1:", path)
