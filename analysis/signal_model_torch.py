@@ -125,10 +125,8 @@ class IIP(RecurBayes):
             if (tuple(path[-2]) in self.gmap.silos.values()
                     and tuple(path[-2]) != self.gmap.silos[hypo]):
                 # print(ret)
-                ret += self.pulse
+                ret *= np.exp(self.pulse)
 
         ret += self.colors[hypo][tuple(path[-1])]
         # print("PHI_IIP", ret, self.colors, hypo, path[-1])
         return ret
-
-
