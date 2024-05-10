@@ -15,16 +15,19 @@ from torch import optim
 
 REGRESSION_HISTORY = {}
 
+LOG_FP = open("../logs/temp_.log", "w")
+
 
 def get_iip_problems():
-    with open("./raw_data/IIP_500_2_zero_shot_test_10231552_extract.json", "r") as fp:
+    with open("../raw_data/IIP_500_2_zero_shot_test_10231552_extract.json",
+              "r") as fp:
         problems = json.load(fp)
 
     return problems
 
 
 def get_human_data():
-    df = pandas.read_excel("./raw_data/human_study_iip.xlsx")
+    df = pandas.read_excel("../raw_data/human_study_iip.xlsx")
     data = {}
     for i in range(len(df)):
         name = df.loc[i]['name']
@@ -44,7 +47,7 @@ def get_human_data():
 
 
 def get_llm_data():
-    df = pandas.read_excel("./raw_data/gpt_2023112016_iip.xlsx")
+    df = pandas.read_excel("../raw_data/gpt_2023112016_iip.xlsx")
     keys = []
     for row in df:
         keys += [row]
@@ -133,8 +136,14 @@ class Regression:
         #                 self.params[i] = 0
 
         print("Loss:", self.loss)
-        print("Gradient: ", self.params.grad)
+        print("Gradient: ", self.params.grad, torch.sum(self.params.grad**2))
         print("Params: ", self.params)
+
+        LOG_FP.write("Loss: " + str(self.loss))
+        LOG_FP.write("Gradient: " + str(self.params.grad) +
+                     str(torch.sum(self.params.grad**2)))
+        LOG_FP.write("Params: " + str(self.params))
+
         if torch.any(self.params < 1e-7) or torch.any(self.params > 1 - 1e-7):
             self.params = torch.tensor(F.relu(self.params - 1e-7) + 1e-7,
                                        dtype=float,
@@ -145,7 +154,8 @@ class Regression:
                                        requires_grad=True)
             forced_same = True
             self.optimizer = self.args.get(
-                "optimizer", optim.SGD)([self.params, self.aug_params], lr=0.001)
+                "optimizer", optim.SGD)([self.params, self.aug_params],
+                                        lr=0.001)
             print("BOUNDED")
         else:
             self.history += [[
@@ -177,7 +187,8 @@ class Regression:
                                    method='exp',
                                    log=self.logs[i])
         for selection, model in zip(self.selections, self.models):
-            ret += torch.log(model.calculate(2, 1)[selection]) # Fix level 2 and target 1
+            ret += torch.log(model.calculate(
+                2, 1)[selection])  # Fix level 2 and target 1
         aug = torch.tensor([0.], dtype=float)
         for i in range(4):
             if self.mask[i] is not None:
@@ -198,7 +209,8 @@ class Regression:
                 print("NFLAG =", nflag)
             if abs(last_loss - self.loss) < epsilon or nflag > 20:
                 break
-            last_loss = min(1e7 if torch.isnan(self.loss) else self.loss, last_loss)
+            last_loss = min(1e7 if torch.isnan(self.loss) else self.loss,
+                            last_loss)
         return self.params
 
 
@@ -222,7 +234,6 @@ def visualize_(ds, rdata, name="Null"):
 
     result = result / len(ds)
     return result, name, ds
-
 
 
 def human(index):
@@ -279,7 +290,7 @@ def train_all_human(init=[0.5] * 4,
         print(i, name)
         name, result, reg = train_process(test_data, name=name)
         data[name] = [result, reg.history]
-        with open(f"./logs/{filename}_{i}.dat", "wb") as fp:
+        with open(f"../logs/{filename}_{i}.dat", "wb") as fp:
             pickle.dump(data[name], fp)
 
 
@@ -291,7 +302,7 @@ def train_all_llm(init=[0.5] * 4, mask=[None] * 4, filename="4dim_log"):
         print(name)
         name, result, reg = train_process(test_data, name=name)
         data[name] = [result, reg.history]
-        with open(f"./logs/llm_{filename}_{name}.dat", "wb") as fp:
+        with open(f"../logs/llm_{filename}_{name}.dat", "wb") as fp:
             pickle.dump(data[name], fp)
 
     for i in range(-1, 0):
@@ -300,12 +311,13 @@ def train_all_llm(init=[0.5] * 4, mask=[None] * 4, filename="4dim_log"):
         print(i, name)
         name, result, reg = train_process(test_data, name=name)
         data[name] = [result, reg.history]
-        with open(f"./logs/human_{filename}_{i}.dat", "wb") as fp:
+        with open(f"../logs/human_{filename}_{i}.dat", "wb") as fp:
             pickle.dump(data[name], fp)
 
 
 if __name__ == '__main__':
     # fig = post_process()
     # fig.savefig(f"../figs/human_{i:02}_{name}")
-    train_all_human()
- 
+    # train_all_human()
+    train_all_human(mask=[None, None, None, None], filename="4dim-human")
+    train_all_llm(mask=[None, None, None, None], filename="4dim--llms")

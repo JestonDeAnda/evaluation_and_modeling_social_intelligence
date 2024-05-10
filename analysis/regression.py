@@ -94,8 +94,8 @@ def calc_torch(
 
 
 def calculate(gmap, routes, alpha, beta):
-    ea = np.exp(-alpha)
-    eb = np.exp(-beta)
+    # ea = np.exp(-alpha)
+    # eb = np.exp(-beta)
     ea = alpha
     eb = beta
     m = hybrid.StrategyHybrid(gmap)
