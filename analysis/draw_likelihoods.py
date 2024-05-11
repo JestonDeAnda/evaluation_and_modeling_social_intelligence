@@ -45,7 +45,11 @@ def visualize_(ds, rdata, name="Null", resolution=100):
     return result, name, ds
 
 
-def draw_likelihood(total, rdata, results, filename="allhuman"):
+def draw_likelihood(total,
+                    rdata,
+                    results,
+                    filename="allhuman",
+                    prefix="../figures/"):
     """
     Draw figrue for all human data.
     """
@@ -69,11 +73,12 @@ def draw_likelihood(total, rdata, results, filename="allhuman"):
 
     loc = {
         'Shortest': [(20, 90), 90, 'x-large', 2],
-        'Reversed': [(100, 115), 90, 'x-large', 0],
-        'Hybrid': [(80, 20), 0, 'x-large', 1],
+        'Reversed': [(120, 115), 90, 'x-large', 0],
+        'Hybrid': [(120, 20), 0, 'x-large', 1],
         'Avoidant': [(180, 110), 90, 'x-large', 3]
     }
-    csz = [
+    csz = [np.array([255, 50, 50])] * 4
+    [
         np.array([34, 37, 98]),
         np.array([153, 36, 18]),
         np.array([208, 221, 224]),
@@ -94,7 +99,7 @@ def draw_likelihood(total, rdata, results, filename="allhuman"):
     ax.set_yticklabels([0, '$exp(-\\beta)$', 1], rotation=90)
 
     fig.tight_layout()
-    fig.savefig(f"fixphi_{filename}.png", dpi=600)
+    fig.savefig(f"{prefix}fixphi_{filename}.png", dpi=600)
 
 
 def draw_model_regions_iip(
@@ -161,10 +166,13 @@ def draw_model_regions_iip(
 
 
 if __name__ == '__main__':
-    with open(
-            "../data/IIP_50_20_zero_shot_test10231552_THRES_099_PULSE_100.dat",
-            'rb') as fp:
-        rdata = pickle.load(fp)
+
+    try:
+        with open("../data/IIP_rdata_THRES_0.99_PULSE_100.dat", 'rb') as fp:
+            rdata = pickle.load(fp)
+    except:
+        print(
+            "Please run `./param_data_gen.py` first for generating data file.")
 
     df = pd.read_excel("../raw_data/human_study_iip.xlsx")
 
@@ -226,15 +234,14 @@ if __name__ == '__main__':
     model_data = {}
     for m in models:
         model_data[m] = []
-        for row in df.to_numpy():
-            for i, m in enumerate(models):
-                # print(row)
-                if row[2 * i +
-                       3] not in ['best', 'shortest', 'misleading', 'far']:
-                    continue
-                model_data[m] += [{
-                    "image_id": row[0],
-                    "user_option": row[2 * i + 3]
-                }]
+    for row in df.to_numpy():
+        for i, m in enumerate(models):
+            # print(row)
+            if row[2 * i + 3] not in ['best', 'shortest', 'misleading', 'far']:
+                continue
+            model_data[m] += [{
+                "image_id": row[0],
+                "user_option": row[2 * i + 3]
+            }]
 
     draw_likelihood(model_data[model], rdata, post_sum[::2, ::2, :], model)

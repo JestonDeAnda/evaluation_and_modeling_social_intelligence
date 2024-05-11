@@ -20,6 +20,9 @@ with open("../raw_data/IIP_500_2_zero_shot_test_10231552_extract.json",
           encoding="utf8") as fp:
     problems = json.load(fp)
 
+if os.path.exists("../data/regions/"):
+    os.mkdir("../data/regions/")
+
 
 def single(problem):
     print("Processing problem:", problem[0])

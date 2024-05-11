@@ -18,6 +18,7 @@ if __name__ == '__main__':
     DICT = {"shortest": 1, "far": 2, "best": 3, "misleading": 0}
     prefix = "../data/regions/"
     files = list(os.walk(prefix))[0][2]
+    assert len(files) == 500, "Please run file `./reference_regions.py` first!"
 
     with open("../raw_data/IIP_500_2_zero_shot_test_10231552_extract.json",
               "r",
@@ -25,7 +26,6 @@ if __name__ == '__main__':
         problems = json.load(fp)
 
     try:
-
         with open("../data/region_average.pkl", "rb") as fp:
             post_sum = pickle.load(fp)
     except:
