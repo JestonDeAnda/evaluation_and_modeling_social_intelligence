@@ -112,9 +112,7 @@ def generate_iip_strategy_selection_regions(example):
     """
     gmap, routes, gt, best_trj_type = parse_json_prompt(example)
     regions_log = {}
-    for thres, pulse in [  (0.3, 1), (0.99, 1),
-        (0.3, 100), (0.99, 100)
-    ]:
+    for thres, pulse in [(0.3, 1), (0.99, 1), (0.3, 100), (0.99, 100)]:
         resolution = 200
         results = np.zeros([resolution, resolution, 4])
         # thres, pulse = 0.99, 1000
