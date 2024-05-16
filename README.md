@@ -44,3 +44,6 @@ python generation/iip_generator.py
 ![IR results](./figures/ir_results.png)
 ![IIP results](./figures/iip_results.png)
 
+## Reference
+
+J. Wang*, C. Zhang*, J. Li, Y. Ma, L. Niu, J. Han, Y. Peng, Y. Zhu, L. Fan. Evaluating and Modeling Social Intelligence: A Comparative Study of Human and AI Capabilities. CogSci 2024.
