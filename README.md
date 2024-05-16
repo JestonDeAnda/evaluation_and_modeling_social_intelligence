@@ -1,4 +1,4 @@
-    # evaluation_and_modeling_social_intelligence
+# evaluation_and_modeling_social_intelligence
 code for *Evaluating and Modeling Social Intelligence: A Comparative Study of Human and AI Capabilities*
 
 
@@ -6,6 +6,10 @@ code for *Evaluating and Modeling Social Intelligence: A Comparative Study of Hu
 
 
 ![Evaluation tasks: IR (left) and IIP (right).](./figures/two_tasks.png)
+
+## Demo
+
+https://vimeo.com/946841179?share=copy
 
 ## Generator
 
